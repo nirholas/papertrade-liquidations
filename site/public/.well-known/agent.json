@@ -1,0 +1,140 @@
+{
+  "name": "Papertrade Liquidations",
+  "description": "Read-only liquidation (bust) map and closest-to-bust feed for Papertrade, the 1000x synthetic perps exchange on HyperEVM. Unofficial.",
+  "url": "https://papertrade-liquidations.pages.dev/mcp",
+  "version": "0.2.0",
+  "protocolVersion": "0.3.0",
+  "preferredTransport": "JSONRPC",
+  "provider": {
+    "organization": "nirholas",
+    "url": "https://github.com/nirholas"
+  },
+  "documentationUrl": "https://papertrade-liquidations.pages.dev/docs/",
+  "iconUrl": "https://papertrade-liquidations.pages.dev/favicon.svg",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": false
+  },
+  "securitySchemes": {},
+  "defaultInputModes": [
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "application/json",
+    "text/plain"
+  ],
+  "additionalInterfaces": [
+    {
+      "url": "https://papertrade-liquidations.pages.dev/mcp",
+      "transport": "MCP-STREAMABLE-HTTP"
+    }
+  ],
+  "skills": [
+    {
+      "id": "get_bust_map",
+      "name": "Bust map by market",
+      "description": "Liquidation (bust) map for BTC or ETH on Papertrade: notional that busts at each price bucket, split into long busts below the mark and short busts above it. Built from the largest open positions, each bust price recomputed with the verified SDK formula. Includes the protocol-wide totals, coverage of the followed wallets and an optional cascade (notional that busts if price moves X%). Read-only.",
+      "tags": [
+        "papertrade",
+        "liquidations",
+        "hyperliquid",
+        "read-only"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "examples": [
+        "Call get_bust_map through the MCP server at https://papertrade-liquidations.pages.dev/mcp"
+      ]
+    },
+    {
+      "id": "get_closest_to_bust",
+      "name": "Closest-to-bust positions",
+      "description": "The open Papertrade positions closest to their bust price right now, nearest first, across BTC and ETH or one market. Each row has side, leverage, margin, notional, entry, bust price and the distance to bust in percent and dollars. Covers the largest open-notional wallets. Read-only.",
+      "tags": [
+        "papertrade",
+        "liquidations",
+        "hyperliquid",
+        "read-only"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "examples": [
+        "Call get_closest_to_bust through the MCP server at https://papertrade-liquidations.pages.dev/mcp"
+      ]
+    },
+    {
+      "id": "get_bust_cluster_summary",
+      "name": "Bust cluster summary",
+      "description": "Where liquidations cluster for a market: the largest groups of neighbouring bust prices on each side of the mark with their notional, position count and distance, plus a cascade ladder (notional that busts for moves of 0.1%, 0.25%, 0.5%, 1%, 2% and 5%) for the followed wallets and for the whole protocol. The ladder is estimated at bucket resolution. Read-only.",
+      "tags": [
+        "papertrade",
+        "liquidations",
+        "hyperliquid",
+        "read-only"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "examples": [
+        "Call get_bust_cluster_summary through the MCP server at https://papertrade-liquidations.pages.dev/mcp"
+      ]
+    },
+    {
+      "id": "get_wallet_distance_to_bust",
+      "name": "Distance to bust for a wallet",
+      "description": "Distance to bust for every open Papertrade position of one wallet address: side, leverage, margin, notional, entry, bust price, the live mark, the move left in percent and dollars, and a danger label (watch within 1%, danger within 0.25%, critical within 0.05%). Public on-chain data only, no signing and no key. Read-only.",
+      "tags": [
+        "papertrade",
+        "liquidations",
+        "hyperliquid",
+        "read-only"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "examples": [
+        "Call get_wallet_distance_to_bust through the MCP server at https://papertrade-liquidations.pages.dev/mcp"
+      ]
+    },
+    {
+      "id": "get_protocol_liquidation_map",
+      "name": "Protocol-wide liquidation map",
+      "description": "The whole-protocol liquidation map published by the Papertrade API: every open position, not just the largest wallets, in buckets around the mark (plus totals beyond the range). Cheaper and wider than get_bust_map, with no per-position detail. Optionally regroup onto a coarser bucket size. Read-only.",
+      "tags": [
+        "papertrade",
+        "liquidations",
+        "hyperliquid",
+        "read-only"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "examples": [
+        "Call get_protocol_liquidation_map through the MCP server at https://papertrade-liquidations.pages.dev/mcp"
+      ]
+    }
+  ]
+}

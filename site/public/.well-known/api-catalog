@@ -1,0 +1,51 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://papertrade-liquidations.pages.dev/api/heatmap",
+      "service-desc": [
+        {
+          "href": "https://papertrade-liquidations.pages.dev/openapi.json",
+          "type": "application/vnd.oai.openapi+json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://papertrade-liquidations.pages.dev/docs/reference",
+          "type": "text/html"
+        }
+      ]
+    },
+    {
+      "anchor": "https://papertrade-liquidations.pages.dev/mcp",
+      "service-desc": [
+        {
+          "href": "https://papertrade-liquidations.pages.dev/.well-known/mcp/server-card.json",
+          "type": "application/json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://papertrade-liquidations.pages.dev/docs/mcp",
+          "type": "text/html"
+        }
+      ]
+    },
+    {
+      "anchor": "https://papertrade-liquidations.pages.dev/docs/",
+      "service-doc": [
+        {
+          "href": "https://papertrade-liquidations.pages.dev/docs/",
+          "type": "text/html"
+        },
+        {
+          "href": "https://papertrade-liquidations.pages.dev/llms.txt",
+          "type": "text/plain"
+        },
+        {
+          "href": "https://papertrade-liquidations.pages.dev/llms-full.txt",
+          "type": "text/plain"
+        }
+      ]
+    }
+  ]
+}

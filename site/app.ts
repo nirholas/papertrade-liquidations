@@ -14,6 +14,7 @@ import { FeedView } from '../src/ui/feed.js';
 import { createLimitedFetch } from '../src/ui/limiter.js';
 import { ClosestTable } from '../src/ui/table.js';
 import { Tracker } from '../src/ui/tracker.js';
+import { initLanding } from './landing.js';
 
 const STREAM_BASE = 'https://exchange.papertrade.xyz';
 const FOLLOW_WALLETS = 40;
@@ -566,4 +567,5 @@ function init(): void {
   void boot();
 }
 
+initLanding();
 init();

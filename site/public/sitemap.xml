@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://papertrade-liquidations.pages.dev/</loc><lastmod>2026-10-10</lastmod></url>
-  <url><loc>https://papertrade-liquidations.pages.dev/llms.txt</loc><lastmod>2026-10-10</lastmod></url>
-  <url><loc>https://papertrade-liquidations.pages.dev/openapi.json</loc><lastmod>2026-10-10</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/docs/</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/docs/changelog</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/docs/concepts</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/docs/connect</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/docs/discovery</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/docs/faq</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/docs/mcp</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/docs/quickstart</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/docs/reference</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/docs/security</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/docs/self-hosting</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/llms.txt</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/llms-full.txt</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/openapi.json</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/.well-known/mcp/server-card.json</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/.well-known/agent-card.json</loc><lastmod>2026-10-11</lastmod></url>
+  <url><loc>https://papertrade-liquidations.pages.dev/.well-known/api-catalog</loc><lastmod>2026-10-11</lastmod></url>
 </urlset>

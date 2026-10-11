@@ -39,7 +39,10 @@
   "author": { "@type": "Person", "name": "nirholas", "url": "https://github.com/nirholas" }
 }
 </script>
+<script src="/embed.js"></script>
 <link rel="stylesheet" href="/styles.css">
+<link rel="alternate" type="text/markdown" href="/docs/index.md">
+<link rel="mcp-server-card" href="/.well-known/mcp/server-card.json">
 </head>
 <body>
 <a class="skip" href="#map">Skip to the liquidation map</a>
@@ -53,10 +56,23 @@
     <a href="#map">Map</a>
     <a href="#closest">Closest</a>
     <a href="#feed">Feed</a>
-    <a href="/openapi.json">API</a>
+    <a href="/docs/">Docs</a>
+    <a href="#connect">MCP</a>
     <a href="https://github.com/nirholas/papertrade-liquidations" rel="noopener">GitHub</a>
+    <a class="os-link" href="https://papertrade-os.pages.dev/?open=liquidations" rel="noopener">Open in Papertrade OS</a>
   </nav>
 </header>
+
+<section class="hero" aria-labelledby="hero-h">
+  <p class="eyebrow">Live on Papertrade, BTC and ETH, up to 1000x</p>
+  <h1 id="hero-h">See where 1000x positions bust, before price gets there.</h1>
+  <p class="lede">A live liquidation map, a closest-to-bust feed and a read-only MCP server for your AI. Every bust price is recomputed with the Papertrade SDK and cross-checked against the exchange.</p>
+  <div class="cta">
+    <a class="btn btn-primary" href="#map">Open the map</a>
+    <a class="btn" href="#connect">Connect your AI</a>
+    <a class="btn" href="/docs/">Read the docs</a>
+  </div>
+</section>
 
 <p class="disclaimer" role="note"><strong>Unofficial.</strong> Not affiliated with Papertrade. High leverage can lose your whole margin: at 1000x a 0.05% move busts a position. This site is read-only and never asks you to connect a wallet or sign anything.</p>
 
@@ -184,6 +200,35 @@
   </details>
 </main>
 
+<section class="marketing features" id="features" aria-labelledby="features-h">
+  <h2 id="features-h">Built for people and agents</h2>
+  <ul class="cards">
+    <li><h3>Bust map</h3><p>Candles with a histogram of notional at risk by bust price, long below the mark and short above it, plus the whole-protocol outline.</p></li>
+    <li><h3>Closest to bust</h3><p>Open positions ranked by distance to their bust price, with watch, danger and critical thresholds at 1%, 0.25% and 0.05%.</p></li>
+    <li><h3>Cascade estimate</h3><p>How much notional busts if price moves 0.1% to 5% in either direction, so you can see where a move feeds on itself.</p></li>
+    <li><h3>Verified prices</h3><p>Bust prices come from the papertrade-sdk formula and are compared with the API. The diagnostics panel shows the mismatch count.</p></li>
+    <li><h3>MCP server</h3><p>Five read-only tools at /mcp for Claude, Codex, ChatGPT, Gemini, Cursor and any MCP client. No key, no sign-in.</p></li>
+    <li><h3>Open API and docs</h3><p>A documented HTTP endpoint, OpenAPI 3.1, llms.txt, an agent card and markdown docs. Apache-2.0 and self-hostable.</p></li>
+  </ul>
+</section>
+
+<section class="marketing works" aria-labelledby="works-h">
+  <h2 id="works-h" class="sr-only">Works with</h2>
+  <p class="works-label">Works with</p>
+  <ul class="works-list"><li>Claude</li><li>Codex</li><li>ChatGPT</li><li>Gemini</li><li>Cursor</li><li>VS Code</li><li>Windsurf</li><li>Zed</li></ul>
+</section>
+
+<section class="marketing connect" id="connect" aria-labelledby="connect-h">
+  <h2 id="connect-h">Connect your AI in one line</h2>
+  <p class="muted">Server URL: <code>https://papertrade-liquidations.pages.dev/mcp</code>. Streamable HTTP, no sign-in, every tool read-only.</p>
+  <div class="tabs" role="tablist" aria-label="AI client" id="client-tabs"></div>
+  <div class="tabpanel" id="client-panel" role="tabpanel" tabindex="0">
+    <div class="code-box"><button type="button" class="btn copy-btn" id="client-copy">Copy</button><pre><code id="client-code"></code></pre></div>
+    <p class="muted small" id="client-note"></p>
+  </div>
+  <p class="muted small">More clients (Windsurf, Zed, Cline, Goose, Continue, Claude API, OpenAI Responses) are in <a href="/docs/connect">Connect your AI</a>. Then ask: "Which BTC positions are closest to bust?"</p>
+</section>
+
 <footer class="foot">
   <p><strong>Unofficial.</strong> Not affiliated with, endorsed by or sponsored by Papertrade. Not financial advice. Positions are public on-chain data; this site only reads them.</p>
   <nav aria-label="Related projects" class="related">
@@ -199,7 +244,7 @@
     <a href="https://papertrade-x402.pages.dev" rel="noopener">x402</a>
     <a href="https://papertrade.xyz" rel="noopener">papertrade.xyz</a>
   </nav>
-  <p class="muted small">Apache-2.0 licensed. <a href="/llms.txt">llms.txt</a> &middot; <a href="/openapi.json">openapi.json</a> &middot; <a href="/.well-known/security.txt">security</a></p>
+  <p class="muted small">Apache-2.0 licensed. <a href="/docs/">Docs</a> &middot; <a href="https://github.com/nirholas/papertrade-liquidations" rel="noopener">GitHub</a> &middot; <a href="/llms.txt">llms.txt</a> &middot; <a href="/mcp">MCP</a> &middot; <a href="/openapi.json">openapi.json</a> &middot; <a href="/.well-known/security.txt">security</a></p>
 </footer>
 
 <div class="sr-only" id="announce" role="status" aria-live="assertive"></div>

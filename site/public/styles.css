@@ -264,3 +264,46 @@ tr.cross-up { animation: cross 1600ms ease-out; }
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   .skeleton { animation: none; }
 }
+
+/* Landing */
+.hero { max-width: 1280px; margin: 0 auto; padding: 36px 16px 28px; display: grid; gap: 14px; }
+.eyebrow { font: 600 12px/1 var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
+.hero h1 { font-size: clamp(28px, 5vw, 52px); line-height: 1.08; letter-spacing: -0.03em; max-width: 18ch; }
+.lede { max-width: 62ch; color: var(--muted); font-size: clamp(15px, 2vw, 18px); line-height: 1.55; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+a.btn { text-decoration: none; display: inline-flex; align-items: center; background: var(--panel); color: var(--text); }
+a.btn:hover { border-color: var(--muted); filter: none; }
+a.btn.btn-primary { background: var(--text); color: var(--bg); }
+.cta .btn { padding: 10px 18px; font-size: 14px; }
+nav a.os-link { color: var(--accent); border: 1px solid var(--line); }
+nav a.os-link:hover { color: var(--accent); border-color: var(--accent); }
+a:focus-visible, button:focus-visible, summary:focus-visible, [role="tab"]:focus-visible, .tabpanel:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.marketing { max-width: 1280px; margin: 0 auto; padding: 24px 16px; display: grid; gap: 14px; }
+.marketing h2 { font-size: 22px; letter-spacing: -0.02em; }
+.cards { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.cards li { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: grid; gap: 6px; box-shadow: var(--shadow); align-content: start; }
+.cards li:hover { border-color: var(--muted); }
+.cards h3 { font-size: 15px; }
+.cards p { color: var(--muted); font-size: 14px; line-height: 1.55; }
+.works { text-align: center; justify-items: center; }
+.works-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.works-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 12px; }
+.works-list li { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 6px 16px; font-weight: 600; font-size: 14px; }
+.connect code { font-family: var(--mono); font-size: 0.92em; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; overflow-wrap: anywhere; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tabs [role="tab"] { font: inherit; font-size: 13px; font-weight: 600; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); cursor: pointer; }
+.tabs [role="tab"]:hover { color: var(--text); border-color: var(--muted); }
+.tabs [role="tab"]:active { transform: translateY(1px); }
+.tabs [role="tab"][aria-selected="true"] { color: var(--bg); background: var(--text); border-color: var(--text); }
+.tabpanel { display: grid; gap: 8px; }
+.code-box { position: relative; }
+.code-box pre { margin: 0; padding: 16px; padding-right: 80px; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; font: 13px/1.55 var(--mono); }
+.copy-btn { position: absolute; top: 8px; right: 8px; background: var(--panel-2); color: var(--muted); }
+.copy-btn:hover { color: var(--text); filter: none; }
+.small { font-size: 13px; }
+
+/* Embedded in Papertrade OS or any frame: show only the product. */
+html.embed .top, html.embed .hero, html.embed .marketing, html.embed .foot { display: none; }
+html.embed .disclaimer { margin-bottom: 8px; }
+html.embed main { padding-top: 8px; }

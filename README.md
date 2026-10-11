@@ -5,9 +5,11 @@
 [![HyperEVM](https://img.shields.io/badge/HyperEVM-chain_999-0a8f5b?style=flat-square)](https://papertrade.xyz)
 [![GitHub stars](https://img.shields.io/github/stars/nirholas/papertrade-liquidations?style=flat-square&color=0a8f5b)](https://github.com/nirholas/papertrade-liquidations/stargazers)
 [![Last commit](https://img.shields.io/github/last-commit/nirholas/papertrade-liquidations?style=flat-square&color=0a8f5b)](https://github.com/nirholas/papertrade-liquidations/commits/main)
+[![MCP](https://img.shields.io/badge/MCP-streamable_HTTP-0a8f5b?style=flat-square)](https://papertrade-liquidations.pages.dev/docs/mcp)
+[![Docs](https://img.shields.io/badge/docs-papertrade--liquidations.pages.dev-0a8f5b?style=flat-square)](https://papertrade-liquidations.pages.dev/docs/)
 [![Unofficial](https://img.shields.io/badge/community-unofficial-lightgrey?style=flat-square)](#the-papertrade-toolkit)
 
-[Live site](https://papertrade-liquidations.pages.dev) · [Issues](https://github.com/nirholas/papertrade-liquidations/issues) · [Discussions](https://github.com/nirholas/papertrade-liquidations/discussions) · [Papertrade](https://papertrade.xyz) · [Toolkit](#the-papertrade-toolkit)
+[Live site](https://papertrade-liquidations.pages.dev) · [Docs](https://papertrade-liquidations.pages.dev/docs/) · [MCP](#mcp-server-and-connectors) · [Issues](https://github.com/nirholas/papertrade-liquidations/issues) · [Discussions](https://github.com/nirholas/papertrade-liquidations/discussions) · [Papertrade](https://papertrade.xyz) · [Toolkit](#the-papertrade-toolkit)
 
 Unofficial live liquidation monitor and heatmap for [Papertrade](https://papertrade.xyz), the fully on-chain 1000x synthetic perps exchange on Hyperliquid's HyperEVM.
 
@@ -27,6 +29,29 @@ The screenshot shows the BTC liquidation map. Candles sit on the left, solid bar
 - **Cascade** card: notional that would bust if price moved X% (slider, 0.02% to 5%), in both directions, for the followed wallets and protocol-wide, with a curve.
 - **Diagnostics**: every bust price is recomputed with the SDK's `liquidationPriceRaw` and compared with the API value. The panel shows the mismatch count (0 across all recorded and live positions), coverage of protocol notional, connection state and data freshness.
 - **HTTP API**: `GET /api/heatmap` (see [openapi.json](site/public/openapi.json)).
+- **MCP server** at `/mcp` with five read-only tools, so any AI client can query the map.
+- **Docs** at [/docs/](https://papertrade-liquidations.pages.dev/docs/) with search, markdown twins, `llms.txt` and `llms-full.txt`.
+- **Embeddable**: add `?embed=1` for just the product. Opens as a window in [Papertrade OS](https://papertrade-os.pages.dev/?open=liquidations).
+
+## MCP server and connectors
+
+Endpoint: `https://papertrade-liquidations.pages.dev/mcp` (Streamable HTTP, stateless, no auth). Every tool is read-only: nothing signs, sends or trades.
+
+| Tool | Returns |
+| --- | --- |
+| `get_bust_map` | Bust notional per price bucket for BTC or ETH, coverage and an optional cascade |
+| `get_closest_to_bust` | Positions ranked by distance to bust |
+| `get_bust_cluster_summary` | Largest clusters of bust prices on each side of the mark |
+| `get_wallet_distance_to_bust` | One wallet's positions and distance to bust |
+| `get_protocol_liquidation_map` | The API's protocol-wide map, regroupable by bucket size |
+
+```sh
+claude mcp add --transport http papertrade-liquidations https://papertrade-liquidations.pages.dev/mcp
+codex mcp add papertrade-liquidations --url https://papertrade-liquidations.pages.dev/mcp
+gemini mcp add --transport http papertrade-liquidations https://papertrade-liquidations.pages.dev/mcp
+```
+
+Cursor, VS Code, Claude Desktop, ChatGPT, Windsurf, Zed, Cline, Goose, Continue and the Claude and OpenAI APIs are covered in [Connect your AI](https://papertrade-liquidations.pages.dev/docs/connect). Agents can also start from [`llms.txt`](https://papertrade-liquidations.pages.dev/llms.txt), the [server card](https://papertrade-liquidations.pages.dev/.well-known/mcp/server-card.json) or the [agent card](https://papertrade-liquidations.pages.dev/.well-known/agent-card.json). `server.json` describes the server for the MCP registry.
 
 ## Quick start
 
@@ -44,6 +69,8 @@ npm run typecheck
 - `src/` is pure TypeScript shared by the browser and the Pages Function: `positions` (bust recompute and check), `buckets`, `cascade`, `detect` (liquidation detection, price tape, history resolution), `heatmap`, `collect`, `snapshots`, `limiter`, `format`.
 - `src/ui/` is the browser layer: `tracker` (wallet streams), `chart` (lightweight-charts with a custom series primitive for the histogram), `table`, `feed`.
 - `site/app.ts` wires them together and is bundled by esbuild to `site/public/app.js`.
+- `site/functions/mcp.ts` is the MCP endpoint, with protocol plumbing in `site/functions/_lib/mcp.ts` and the tools in `_lib/tools.ts`. `_lib/heatmap-core.ts` is the loader shared with `/api/heatmap`.
+- `docs/*.md` is the documentation source, rendered by `scripts/build-docs.mjs`. `scripts/build-discovery.ts` generates the `.well-known` files from the tool registry.
 - `site/functions/api/heatmap.ts` is the Pages Function (Cache API, 10 s). `site/functions/api/papertrade/[[path]].ts` is the same-origin proxy, because the Papertrade API sends no CORS headers on its REST routes.
 
 ### Data source
@@ -57,9 +84,10 @@ The `/state/user/live` endpoint allows only about 10 to 12 new connections per m
 | Name | Default | Purpose |
 | --- | --- | --- |
 | `PAPERTRADE_API_URL` | `https://exchange.papertrade.xyz` | Upstream API |
-| `HEATMAP_MAX_WALLETS` | `44` | Max wallets per `/api/heatmap` call. Free plan allows 50 subrequests per call; raise to 100 on a paid plan |
+| `HEATMAP_MAX_WALLETS` | `44` | Max wallets per `/api/heatmap` and MCP call. Free plan allows 50 subrequests per call; raise to 100 on a paid plan |
+| `WALLET_STREAM_TIMEOUT_MS` | `8000` | Wait for one wallet stream before using its cached snapshot |
 
-Both are optional. See `.dev.vars.example`.
+All are optional. See `.dev.vars.example`.
 
 ## Deploy
 

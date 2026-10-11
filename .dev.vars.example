@@ -1,6 +1,7 @@
-# Copy to site/.dev.vars for local `wrangler pages dev`. Both values are optional.
+# Copy to site/.dev.vars for local `wrangler pages dev`. All values are optional.
 # Upstream Papertrade API.
 PAPERTRADE_API_URL=https://exchange.papertrade.xyz
 # Max wallets /api/heatmap may follow. Cloudflare's free plan allows 50 subrequests per call, so keep 44 or less.
 # On a paid plan this can go up to 100.
 HEATMAP_MAX_WALLETS=44
+WALLET_STREAM_TIMEOUT_MS=8000

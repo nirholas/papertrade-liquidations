@@ -1,0 +1,10 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.nirholas/papertrade-liquidations",
+  "title": "Papertrade Liquidations",
+  "description": "Read-only liquidation map, closest-to-bust positions and bust clusters for Papertrade perps on HyperEVM. Unofficial.",
+  "version": "0.2.0",
+  "websiteUrl": "https://papertrade-liquidations.pages.dev/docs/",
+  "repository": { "url": "https://github.com/nirholas/papertrade-liquidations", "source": "github" },
+  "remotes": [{ "type": "streamable-http", "url": "https://papertrade-liquidations.pages.dev/mcp" }]
+}

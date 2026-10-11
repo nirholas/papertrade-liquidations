@@ -1,6 +1,6 @@
 {
   "name": "papertrade-liquidations",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Unofficial live liquidation monitor and heatmap for Papertrade (papertrade.xyz), the 1000x synthetic perps exchange on HyperEVM: bust-price map, closest-to-bust table, liquidation feed, cascade stat and a JSON API.",
   "license": "Apache-2.0",
   "author": "nirholas",
@@ -38,7 +38,12 @@
     "crypto",
     "web3",
     "trading-tools",
-    "on-chain-analytics"
+    "on-chain-analytics",
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "ai-agents",
+    "llms-txt"
   ],
   "repository": {
     "type": "git",
@@ -66,5 +71,6 @@
   "allowScripts": {
     "workerd@1.20261006.1": true,
     "esbuild@0.28.2": true
-  }
+  },
+  "mcpName": "io.github.nirholas/papertrade-liquidations"
 }

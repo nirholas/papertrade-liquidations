@@ -2,7 +2,29 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-hashes' 'sha256-3pRED1tOXas1FXFoPb9TGCjmYe9XQsmO9OV23khV2nY='; img-src 'self' data:; connect-src 'self' https://exchange.papertrade.xyz https://api.hyperliquid.xyz; base-uri 'none'; frame-ancestors 'none'
+
+/
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-hashes' 'sha256-3pRED1tOXas1FXFoPb9TGCjmYe9XQsmO9OV23khV2nY='; img-src 'self' data:; connect-src 'self' https://exchange.papertrade.xyz https://api.hyperliquid.xyz; base-uri 'none'; frame-ancestors 'self' https://papertrade-os.pages.dev https://*.pages.dev
+  Link: </openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"
+  Link: </.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"
+  Link: </mcp>; rel="mcp"
+  Link: </.well-known/mcp/server-card.json>; rel="mcp-server-card"; type="application/json"
+  Link: </llms.txt>; rel="describedby"; type="text/plain"
+  Link: </docs/>; rel="service-doc"; type="text/html"
+
+/index.html
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-hashes' 'sha256-3pRED1tOXas1FXFoPb9TGCjmYe9XQsmO9OV23khV2nY='; img-src 'self' data:; connect-src 'self' https://exchange.papertrade.xyz https://api.hyperliquid.xyz; base-uri 'none'; frame-ancestors 'self' https://papertrade-os.pages.dev https://*.pages.dev
+
+/docs/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'
+  Cache-Control: public, max-age=300
+
+/docs/*.md
+  Content-Type: text/markdown; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+/docs/search-index.json
+  Content-Type: application/json; charset=utf-8
 
 /app.js
   Cache-Control: public, max-age=300
@@ -10,7 +32,26 @@
 /.well-known/*
   Access-Control-Allow-Origin: *
 
+/.well-known/api-catalog
+  Content-Type: application/linkset+json; charset=utf-8
+
+/.well-known/mcp.json
+  Content-Type: application/json; charset=utf-8
+
+/.well-known/mcp/server-card.json
+  Content-Type: application/json; charset=utf-8
+
+/.well-known/agent-card.json
+  Content-Type: application/json; charset=utf-8
+
+/.well-known/agent.json
+  Content-Type: application/json; charset=utf-8
+
 /llms.txt
+  Access-Control-Allow-Origin: *
+  Content-Type: text/plain; charset=utf-8
+
+/llms-full.txt
   Access-Control-Allow-Origin: *
   Content-Type: text/plain; charset=utf-8
 
