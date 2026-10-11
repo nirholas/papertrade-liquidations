@@ -1,0 +1,19 @@
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-hashes' 'sha256-3pRED1tOXas1FXFoPb9TGCjmYe9XQsmO9OV23khV2nY='; img-src 'self' data:; connect-src 'self' https://exchange.papertrade.xyz https://api.hyperliquid.xyz; base-uri 'none'; frame-ancestors 'none'
+
+/app.js
+  Cache-Control: public, max-age=300
+
+/.well-known/*
+  Access-Control-Allow-Origin: *
+
+/llms.txt
+  Access-Control-Allow-Origin: *
+  Content-Type: text/plain; charset=utf-8
+
+/openapi.json
+  Access-Control-Allow-Origin: *
+  Content-Type: application/json; charset=utf-8

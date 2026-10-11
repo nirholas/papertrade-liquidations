@@ -1,0 +1,119 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Papertrade liquidations heatmap API",
+    "version": "0.1.0",
+    "description": "Unofficial, not affiliated with Papertrade. Liquidation map for BTC and ETH built from the largest open Papertrade positions. Every bust price is recomputed with the papertrade-sdk and compared with the API value. High leverage can lose your whole margin.",
+    "license": { "name": "MIT", "url": "https://opensource.org/licenses/MIT" }
+  },
+  "servers": [{ "url": "https://papertrade-liquidations.pages.dev" }],
+  "paths": {
+    "/api/heatmap": {
+      "get": {
+        "operationId": "getHeatmap",
+        "summary": "Liquidation heatmap for one market",
+        "description": "Responses are cached for 10 seconds (x-cache: HIT or MISS). Wallet snapshots behind the response are refreshed a few at a time because the upstream stream endpoint is rate limited per IP; see the freshness field.",
+        "parameters": [
+          { "name": "market", "in": "query", "schema": { "type": "string", "enum": ["BTC", "ETH"], "default": "BTC" } },
+          { "name": "bucket", "in": "query", "description": "Bucket size in dollars. Omit for an automatic size (about 0.05% of the mark price).", "schema": { "type": "number", "minimum": 0.0001, "maximum": 1000000 } },
+          { "name": "wallets", "in": "query", "description": "How many of the largest holders to include.", "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 40 } },
+          { "name": "cascade", "in": "query", "description": "Price move in percent for the cascade figure, both directions.", "schema": { "type": "number", "minimum": 0, "maximum": 25 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Heatmap",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Heatmap" } } }
+          },
+          "400": { "description": "Invalid or unknown parameter", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "502": { "description": "Upstream unavailable or warming up", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": ["ok", "error"],
+        "properties": {
+          "ok": { "const": false },
+          "error": { "type": "object", "required": ["code", "message"], "properties": { "code": { "type": "string" }, "message": { "type": "string" } } }
+        }
+      },
+      "Bucket": {
+        "type": "object",
+        "properties": {
+          "lo": { "type": "number" },
+          "hi": { "type": "number" },
+          "mid": { "type": "number" },
+          "longNotional": { "type": "number", "description": "USD notional of longs busting in this bucket" },
+          "shortNotional": { "type": "number", "description": "USD notional of shorts busting in this bucket" },
+          "longCount": { "type": "integer" },
+          "shortCount": { "type": "integer" }
+        }
+      },
+      "Heatmap": {
+        "type": "object",
+        "required": ["ok", "market", "markPrice", "asOfMs", "bucketUsd", "coverage", "totals", "buckets", "nearest", "diagnostics"],
+        "properties": {
+          "ok": { "const": true },
+          "market": { "type": "string", "enum": ["BTC", "ETH"] },
+          "markPrice": { "type": "number" },
+          "asOfMs": { "type": "integer" },
+          "bucketUsd": { "type": "number" },
+          "coverage": {
+            "type": "object",
+            "properties": {
+              "wallets": { "type": "integer" },
+              "positions": { "type": "integer" },
+              "trackedNotionalUsd": { "type": "number" },
+              "protocolNotionalUsd": { "type": ["number", "null"] },
+              "fraction": { "type": ["number", "null"], "description": "Tracked notional divided by protocol-wide notional, 0 to 1" }
+            }
+          },
+          "totals": { "type": "object", "additionalProperties": { "type": "number" } },
+          "buckets": { "type": "array", "items": { "$ref": "#/components/schemas/Bucket" } },
+          "cascade": { "type": ["object", "null"], "description": "Notional that busts if price moves the requested percent down (longs) or up (shorts)" },
+          "nearest": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "wallet": { "type": "string" },
+                "positionId": { "type": "string" },
+                "side": { "type": "string", "enum": ["long", "short"] },
+                "leverage": { "type": "integer" },
+                "marginUsd": { "type": "number" },
+                "notionalUsd": { "type": "number" },
+                "entry": { "type": "number" },
+                "bust": { "type": "number" },
+                "distancePercent": { "type": "number" },
+                "distanceUsd": { "type": "number" }
+              }
+            }
+          },
+          "protocol": { "type": ["object", "null"], "description": "The protocol-wide liquidation map published by the Papertrade API, in dollars" },
+          "diagnostics": {
+            "type": "object",
+            "properties": {
+              "positions": { "type": "integer" },
+              "mismatches": { "type": "integer", "description": "Positions whose SDK-recomputed bust price differs from the API value" },
+              "wallets": { "type": "integer" },
+              "failedWallets": { "type": "integer" }
+            }
+          },
+          "freshness": {
+            "type": ["object", "null"],
+            "properties": {
+              "refreshed": { "type": "integer" },
+              "cached": { "type": "integer" },
+              "missing": { "type": "integer" },
+              "oldestMs": { "type": ["integer", "null"] },
+              "newestMs": { "type": ["integer", "null"] }
+            }
+          }
+        }
+      }
+    }
+  }
+}

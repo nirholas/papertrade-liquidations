@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Papertrade Liquidations: live bust-price map and cascade monitor</title>
+<meta name="description" content="Unofficial live liquidation monitor for Papertrade, the 1000x synthetic perps exchange on HyperEVM. Bust-price heatmap for BTC and ETH, closest-to-bust positions, a live liquidation feed and a cascade calculator.">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0b0d12" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f5f3ee" media="(prefers-color-scheme: light)">
+<link rel="canonical" href="https://papertrade-liquidations.pages.dev/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Papertrade Liquidations">
+<meta property="og:title" content="Papertrade Liquidations: live bust-price map and cascade monitor">
+<meta property="og:description" content="See where 1000x positions on Papertrade bust. Heatmap, closest-to-bust table, live liquidation feed and cascade calculator for BTC and ETH.">
+<meta property="og:url" content="https://papertrade-liquidations.pages.dev/">
+<meta property="og:image" content="https://papertrade-liquidations.pages.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Liquidation heatmap for BTC with long busts below the mark price and short busts above it.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Papertrade Liquidations">
+<meta name="twitter:description" content="Where 1000x positions bust on Papertrade, live. Unofficial, open source.">
+<meta name="twitter:image" content="https://papertrade-liquidations.pages.dev/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Papertrade Liquidations",
+  "url": "https://papertrade-liquidations.pages.dev/",
+  "description": "Unofficial live liquidation monitor and heatmap for Papertrade, the 1000x synthetic perps exchange on HyperEVM.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "license": "https://opensource.org/licenses/MIT",
+  "codeRepository": "https://github.com/nirholas/papertrade-liquidations",
+  "author": { "@type": "Person", "name": "nirholas", "url": "https://github.com/nirholas" }
+}
+</script>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip" href="#map">Skip to the liquidation map</a>
+
+<header class="top">
+  <a class="brand" href="/" aria-label="Papertrade Liquidations, home">
+    <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="brand-text">Papertrade <b>Liquidations</b></span>
+  </a>
+  <nav aria-label="Primary">
+    <a href="#map">Map</a>
+    <a href="#closest">Closest</a>
+    <a href="#feed">Feed</a>
+    <a href="/openapi.json">API</a>
+    <a href="https://github.com/nirholas/papertrade-liquidations" rel="noopener">GitHub</a>
+  </nav>
+</header>
+
+<p class="disclaimer" role="note"><strong>Unofficial.</strong> Not affiliated with Papertrade. High leverage can lose your whole margin: at 1000x a 0.05% move busts a position. This site is read-only and never asks you to connect a wallet or sign anything.</p>
+
+<main id="main">
+  <section class="stats" aria-label="Market summary">
+    <div class="stat"><span class="stat-label">BTC mark</span><output id="mark-btc" class="stat-value" aria-live="off">&mdash;</output><span class="stat-sub" id="mark-btc-sub">Hyperliquid mid</span></div>
+    <div class="stat"><span class="stat-label">ETH mark</span><output id="mark-eth" class="stat-value" aria-live="off">&mdash;</output><span class="stat-sub" id="mark-eth-sub">Hyperliquid mid</span></div>
+    <div class="stat"><span class="stat-label">Notional followed</span><output id="stat-notional" class="stat-value">&mdash;</output><span class="stat-sub" id="stat-notional-sub">loading wallets</span></div>
+    <div class="stat"><span class="stat-label">Closest to bust</span><output id="stat-closest" class="stat-value">&mdash;</output><span class="stat-sub" id="stat-closest-sub">no positions yet</span></div>
+    <div class="stat"><span class="stat-label">Busts this session</span><output id="stat-busts" class="stat-value">0</output><span class="stat-sub" id="stat-busts-sub">$0 notional</span></div>
+  </section>
+
+  <div class="grid">
+    <section id="map" class="panel map-panel" aria-labelledby="map-h">
+      <div class="panel-head">
+        <h2 id="map-h">Liquidation map</h2>
+        <div class="controls">
+          <fieldset class="seg" aria-label="Market">
+            <label><input type="radio" name="market" value="BTC" checked><span>BTC</span></label>
+            <label><input type="radio" name="market" value="ETH"><span>ETH</span></label>
+          </fieldset>
+          <label class="field"><span>Candles</span>
+            <select id="interval">
+              <option value="1m" selected>1 minute</option>
+              <option value="5m">5 minutes</option>
+              <option value="15m">15 minutes</option>
+              <option value="1h">1 hour</option>
+            </select>
+          </label>
+          <label class="field"><span>Bucket</span><select id="bucket" aria-describedby="bucket-hint"></select></label>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <div id="chart" class="chart" role="img" aria-label="Candlestick chart with a histogram of notional at risk by bust price. Long busts sit below the mark price, short busts above it. The same data is in the tables on this page."></div>
+        <div id="chart-skeleton" class="chart-state skeleton" aria-hidden="false"><span class="sr-only">Loading chart</span></div>
+        <div id="chart-error" class="chart-state state-error" role="alert" hidden>
+          <p><strong>Could not load the chart.</strong> <span id="chart-error-detail"></span></p>
+          <button type="button" class="btn" id="chart-retry">Try again</button>
+        </div>
+      </div>
+      <div class="map-foot">
+        <p class="legend" id="bucket-hint">
+          <span class="key key-long"></span> Long busts (below mark)
+          <span class="key key-short"></span> Short busts (above mark)
+          <span class="key key-proto"></span> Whole protocol (API map)
+        </p>
+        <div class="toggles">
+          <label class="check"><input type="checkbox" id="toggle-protocol" checked><span>Protocol-wide outline</span></label>
+          <label class="check"><input type="checkbox" id="toggle-cascade" checked><span>Cascade lines</span></label>
+        </div>
+      </div>
+    </section>
+
+    <div class="side">
+      <section id="cascade" class="panel" aria-labelledby="cascade-h">
+        <div class="panel-head"><h2 id="cascade-h">Cascade</h2><span class="muted" id="cascade-market">BTC</span></div>
+        <label class="slider"><span>If price moves <output id="cascade-value" for="cascade-range">0.50%</output></span>
+          <input type="range" id="cascade-range" min="0" max="100" step="1" value="58" aria-describedby="cascade-help">
+        </label>
+        <p class="muted small" id="cascade-help">Notional that busts at that move from the current mark, among the followed wallets and across the whole protocol.</p>
+        <div class="cascade-grid">
+          <div class="cascade-side down">
+            <span class="cascade-dir">Down</span>
+            <b id="cascade-down">&mdash;</b>
+            <span class="muted small" id="cascade-down-sub">longs bust</span>
+            <span class="muted small" id="cascade-down-proto"></span>
+          </div>
+          <div class="cascade-side up">
+            <span class="cascade-dir">Up</span>
+            <b id="cascade-up">&mdash;</b>
+            <span class="muted small" id="cascade-up-sub">shorts bust</span>
+            <span class="muted small" id="cascade-up-proto"></span>
+          </div>
+        </div>
+        <svg id="cascade-curve" class="curve" viewBox="0 0 300 70" preserveAspectRatio="none" role="img" aria-label="Notional that busts as the move grows"></svg>
+      </section>
+
+      <section id="feed" class="panel" aria-labelledby="feed-h">
+        <div class="panel-head">
+          <h2 id="feed-h">Liquidation feed</h2>
+          <label class="check"><input type="checkbox" id="sound"><span>Sound</span></label>
+        </div>
+        <p class="tally" id="tally" aria-live="polite">0 busts, $0 notional</p>
+        <ol class="feed" id="feed-list" aria-label="Liquidations, newest first"></ol>
+        <div class="empty" id="feed-empty">
+          <p><strong>Nothing has busted since you opened this page.</strong></p>
+          <p class="muted small" id="feed-empty-detail">Watching the followed wallets and the protocol trade feed. A bust shows up here within seconds.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <section id="closest" class="panel" aria-labelledby="closest-h">
+    <div class="panel-head">
+      <h2 id="closest-h">Closest to bust</h2>
+      <div class="controls">
+        <fieldset class="seg" aria-label="Filter by market">
+          <label><input type="radio" name="table-market" value="all" checked><span>All</span></label>
+          <label><input type="radio" name="table-market" value="BTC"><span>BTC</span></label>
+          <label><input type="radio" name="table-market" value="ETH"><span>ETH</span></label>
+        </fieldset>
+        <label class="field"><span>Show</span>
+          <select id="table-limit"><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option></select>
+        </label>
+      </div>
+    </div>
+    <div class="table-wrap" id="table-wrap">
+      <table class="rows" aria-describedby="closest-note">
+        <thead>
+          <tr><th scope="col">Side</th><th scope="col">Lev</th><th scope="col" class="num">Margin</th><th scope="col" class="num">Notional</th><th scope="col" class="num">Entry</th><th scope="col" class="num">Bust</th><th scope="col" class="num">Distance</th><th scope="col">Wallet</th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="table-skeleton skeleton" id="table-skeleton"><span class="sr-only">Loading positions</span></div>
+      <div class="empty" id="table-empty" hidden><p><strong>No open positions to show.</strong></p><p class="muted small">The followed wallets hold nothing in this market right now. Switch market or check back in a moment.</p></div>
+      <div class="empty state-error" id="table-error" role="alert" hidden><p><strong>Could not read any positions.</strong> <span id="table-error-detail"></span></p><button type="button" class="btn" id="table-retry">Try again</button></div>
+    </div>
+    <p class="muted small" id="closest-note">Distance is the move to the bust price from the current mark. Rows turn amber inside 1%, orange inside 0.25% and red inside 0.05%, and flash when they cross a threshold.</p>
+  </section>
+
+  <details id="diagnostics" class="panel diag">
+    <summary><h2>Diagnostics</h2><span class="muted small" id="diag-summary">starting</span></summary>
+    <dl class="diag-grid" id="diag-grid"></dl>
+    <p class="muted small">Every bust price shown is recomputed from the entry price, leverage and per-market buffer with the Papertrade SDK, then compared with the bust price the API reports. A mismatch would mean this tool and the exchange disagree about where a position dies.</p>
+  </details>
+</main>
+
+<footer class="foot">
+  <p><strong>Unofficial.</strong> Not affiliated with, endorsed by or sponsored by Papertrade. Not financial advice. Positions are public on-chain data; this site only reads them.</p>
+  <nav aria-label="Related projects" class="related">
+    <a href="https://github.com/nirholas/papertrade-liquidations" rel="noopener">papertrade-liquidations</a>
+    <a href="https://github.com/nirholas/papertrade-sdk" rel="noopener">SDK</a>
+    <a href="https://github.com/nirholas/papertrade-ai" rel="noopener">MCP and AI</a>
+    <a href="https://papertrade-explorer.pages.dev" rel="noopener">Explorer</a>
+    <a href="https://papertrade-terminal.pages.dev" rel="noopener">Terminal</a>
+    <a href="https://papertrade-analytics.pages.dev" rel="noopener">Analytics</a>
+    <a href="https://github.com/nirholas/papertrade-alerts" rel="noopener">Alerts</a>
+    <a href="https://papertrade-copytrade.pages.dev" rel="noopener">Copytrade</a>
+    <a href="https://papertrade-yield.pages.dev" rel="noopener">Yield</a>
+    <a href="https://papertrade-x402.pages.dev" rel="noopener">x402</a>
+    <a href="https://papertrade.xyz" rel="noopener">papertrade.xyz</a>
+  </nav>
+  <p class="muted small">MIT licensed. <a href="/llms.txt">llms.txt</a> &middot; <a href="/openapi.json">openapi.json</a> &middot; <a href="/.well-known/security.txt">security</a></p>
+</footer>
+
+<div class="sr-only" id="announce" role="status" aria-live="assertive"></div>
+<script type="module" src="/app.js"></script>
+<noscript><p class="noscript">This page needs JavaScript to stream live positions.</p></noscript>
+</body>
+</html>
