@@ -25,13 +25,23 @@
     "heatmap",
     "perps",
     "defi",
-    "cloudflare-pages"
+    "cloudflare-pages",
+    "liquidation-map",
+    "liquidation-heatmap",
+    "liquidation-tracker",
+    "perpetuals",
+    "bust-price",
+    "typescript",
+    "crypto",
+    "web3",
+    "trading-tools",
+    "on-chain-analytics"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nirholas/papertrade-liquidations.git"
   },
-  "homepage": "https://github.com/nirholas/papertrade-liquidations#readme",
+  "homepage": "https://papertrade-liquidations.pages.dev",
   "bugs": {
     "url": "https://github.com/nirholas/papertrade-liquidations/issues"
   },
