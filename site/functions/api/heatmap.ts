@@ -7,41 +7,12 @@
  * Cloudflare allows 50 subrequests per invocation on the free plan: 4 fixed reads plus one snapshot per wallet,
  * so `wallets` defaults to 40 and is capped at 44. Set HEATMAP_MAX_WALLETS on a paid plan to go up to 100.
  */
-import { PapertradeClient } from 'papertrade-sdk';
-import { collectIncremental, topWallets, type SnapshotStore } from '../../../src/collect.js';
-import { assembleHeatmap, parseProtocolMap } from '../../../src/heatmap.js';
-import { instrumentTable, marketBySymbol } from '../../../src/markets.js';
-import { fetchMids } from '../../../src/mids.js';
-import { type PackedSnapshot } from '../../../src/snapshots.js';
+import { HeatmapError, loadHeatmap, maxWalletsFor, serialize, CACHE_SECONDS, DEFAULT_WALLETS, type HeatmapEnv } from '../_lib/heatmap-core.js';
+import { marketBySymbol } from '../../../src/markets.js';
 
-interface Env {
-  PAPERTRADE_API_URL?: string;
-  HEATMAP_MAX_WALLETS?: string;
-}
+type Env = HeatmapEnv;
 
-const UPSTREAM = 'https://exchange.papertrade.xyz';
 const KNOWN = new Set(['market', 'bucket', 'wallets', 'cascade']);
-const DEFAULT_WALLETS = 40;
-const FREE_PLAN_WALLETS = 44;
-const CACHE_SECONDS = 10;
-const SNAPSHOT_TTL_SECONDS = 1800;
-const REFRESH_PER_CALL = 6;
-const SNAPSHOT_MIN_AGE_MS = 20_000;
-
-/** Per-wallet snapshots live in the Cache API under a synthetic URL on this origin. */
-function snapshotStore(cache: Cache, origin: string, waitUntil: (p: Promise<unknown>) => void): SnapshotStore {
-  const key = (wallet: string) => new Request(`${origin}/__snapshot/${wallet}`, { method: 'GET' });
-  return {
-    async get(wallet) {
-      const hit = await cache.match(key(wallet));
-      return hit ? ((await hit.json()) as PackedSnapshot) : null;
-    },
-    async put(snapshot) {
-      const res = new Response(JSON.stringify(snapshot), { headers: { 'content-type': 'application/json', 'cache-control': `public, max-age=${SNAPSHOT_TTL_SECONDS}` } });
-      waitUntil(cache.put(key(snapshot.wallet), res));
-    },
-  };
-}
 
 const headers = (extra: Record<string, string> = {}) => ({
   'content-type': 'application/json; charset=utf-8',
@@ -68,7 +39,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, waitUntil
   const market = marketBySymbol(url.searchParams.get('market') ?? 'BTC');
   if (!market) return fail(400, 'invalid_parameter', 'market must be BTC or ETH.');
 
-  const maxWallets = Math.min(100, Math.max(1, Number(env.HEATMAP_MAX_WALLETS) || FREE_PLAN_WALLETS));
+  const maxWallets = maxWalletsFor(env);
   const bucket = number(url.searchParams.get('bucket'), 'bucket', 0.0001, 1_000_000);
   const wallets = number(url.searchParams.get('wallets'), 'wallets', 1, maxWallets);
   const cascadePercent = number(url.searchParams.get('cascade'), 'cascade', 0, 25);
@@ -76,55 +47,19 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, waitUntil
   if (wallets instanceof Response) return wallets;
   if (cascadePercent instanceof Response) return cascadePercent;
 
-  const walletCount = Math.floor(wallets ?? Math.min(DEFAULT_WALLETS, maxWallets));
-  const normalized = new URL(url.origin + url.pathname);
-  normalized.searchParams.set('market', market.symbol);
-  if (bucket !== undefined) normalized.searchParams.set('bucket', String(bucket));
-  normalized.searchParams.set('wallets', String(walletCount));
-  if (cascadePercent !== undefined) normalized.searchParams.set('cascade', String(cascadePercent));
-
-  const cache = caches.default;
-  const cacheKey = new Request(normalized.toString(), { method: 'GET' });
-  const hit = await cache.match(cacheKey);
-  if (hit) {
-    const res = new Response(hit.body, hit);
-    res.headers.set('x-cache', 'HIT');
-    return res;
-  }
-
-  const baseUrl = (env.PAPERTRADE_API_URL ?? UPSTREAM).replace(/\/+$/, '');
-  const client = new PapertradeClient({ baseUrl });
   try {
-    const [trading, mids, rawMap, leaders] = await Promise.all([
-      client.tradingState(),
-      fetchMids(),
-      client.liquidationMap(market.id, '5'),
-      topWallets(client, walletCount),
-    ]);
-    const instruments = instrumentTable(trading.instruments);
-    const collected = await collectIncremental(
-      leaders.map((l) => l.address),
-      instruments,
-      { baseUrl, store: snapshotStore(cache, url.origin, waitUntil), refreshPerCall: REFRESH_PER_CALL, minAgeMs: SNAPSHOT_MIN_AGE_MS },
-    );
-    if (collected.diagnostics.wallets === 0 && leaders.length > 0) return fail(502, 'warming_up', 'No wallet snapshots are cached yet and the Papertrade stream endpoint is rate limited. Retry in a minute.');
-    const body = assembleHeatmap({
-      market: market.symbol,
-      mark: mids[market.symbol],
-      asOfMs: Date.now(),
-      bucketUsd: bucket,
-      positions: collected.positions,
-      protocol: parseProtocolMap(rawMap),
-      cascadeFraction: cascadePercent === undefined ? undefined : cascadePercent / 100,
-      diagnostics: collected.diagnostics,
-      freshness: collected.freshness,
+    const { body, cached } = await loadHeatmap({
+      env,
+      origin: url.origin,
+      waitUntil,
+      market,
+      bucket,
+      wallets: wallets === undefined ? Math.min(DEFAULT_WALLETS, maxWallets) : Math.floor(wallets),
+      cascadePercent,
     });
-    const res = new Response(JSON.stringify(body, (_k, v) => (typeof v === 'bigint' ? v.toString() : v)), {
-      headers: headers({ 'cache-control': `public, max-age=${CACHE_SECONDS}`, 'x-cache': 'MISS' }),
-    });
-    waitUntil(cache.put(cacheKey, res.clone()));
-    return res;
+    return new Response(serialize(body), { headers: headers({ 'cache-control': `public, max-age=${CACHE_SECONDS}`, 'x-cache': cached ? 'HIT' : 'MISS' }) });
   } catch (err) {
+    if (err instanceof HeatmapError) return fail(err.status, err.code, err.message);
     return fail(502, 'upstream_error', `Could not build the heatmap: ${err instanceof Error ? err.message : String(err)}`);
   }
 };

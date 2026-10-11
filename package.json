@@ -13,9 +13,12 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p site/functions",
     "test": "vitest run",
     "record": "tsx scripts/record-fixtures.ts",
-    "build:site": "esbuild site/app.ts --bundle --format=esm --minify --target=es2022 --sourcemap --outfile=site/public/app.js",
+    "build:site": "npm run build:app && npm run build:docs && npm run build:discovery",
     "dev:site": "npm run build:site && cd site && wrangler pages dev --port 8794",
-    "deploy:site": "npm run build:site && cd site && wrangler pages deploy"
+    "deploy:site": "npm run build:site && cd site && wrangler pages deploy",
+    "build:app": "esbuild site/app.ts --bundle --format=esm --minify --target=es2022 --sourcemap --outfile=site/public/app.js",
+    "build:docs": "node scripts/build-docs.mjs",
+    "build:discovery": "tsx scripts/build-discovery.ts"
   },
   "keywords": [
     "papertrade",
@@ -54,6 +57,7 @@
     "@cloudflare/workers-types": "^5.20261010.1",
     "@types/node": "^26.6.5",
     "esbuild": "^0.28.2",
+    "marked": "^16.4.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.3",
