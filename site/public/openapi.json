@@ -4,7 +4,7 @@
     "title": "Papertrade liquidations heatmap API",
     "version": "0.1.0",
     "description": "Unofficial, not affiliated with Papertrade. Liquidation map for BTC and ETH built from the largest open Papertrade positions. Every bust price is recomputed with the papertrade-sdk and compared with the API value. High leverage can lose your whole margin.",
-    "license": { "name": "MIT", "url": "https://opensource.org/licenses/MIT" }
+    "license": { "name": "Apache-2.0", "url": "https://www.apache.org/licenses/LICENSE-2.0" }
   },
   "servers": [{ "url": "https://papertrade-liquidations.pages.dev" }],
   "paths": {

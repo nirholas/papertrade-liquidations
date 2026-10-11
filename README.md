@@ -68,4 +68,4 @@ Unofficial, not affiliated with Papertrade, high leverage can lose your whole ma
 
 ## License
 
-MIT, 2026, nirholas.
+Apache-2.0, 2026, nirholas.

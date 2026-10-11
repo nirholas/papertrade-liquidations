@@ -2,7 +2,7 @@
   "name": "papertrade-liquidations",
   "version": "0.1.0",
   "description": "Unofficial live liquidation monitor and heatmap for Papertrade (papertrade.xyz), the 1000x synthetic perps exchange on HyperEVM: bust-price map, closest-to-bust table, liquidation feed, cascade stat and a JSON API.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "nirholas",
   "type": "module",
   "private": true,
