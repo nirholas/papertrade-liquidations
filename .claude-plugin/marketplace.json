@@ -1,0 +1,20 @@
+{
+  "name": "papertrade-liquidations",
+  "owner": {
+    "name": "nirholas"
+  },
+  "description": "Papertrade liquidation maps, closest-to-bust positions and wallet bust distance for agents, via a keyless read-only MCP server.",
+  "plugins": [
+    {
+      "name": "papertrade-liquidations",
+      "source": "./",
+      "description": "Papertrade liquidation maps, closest-to-bust positions and wallet bust distance for agents, via a keyless read-only MCP server.",
+      "tags": [
+        "mcp",
+        "liquidations",
+        "hyperevm",
+        "perps"
+      ]
+    }
+  ]
+}
