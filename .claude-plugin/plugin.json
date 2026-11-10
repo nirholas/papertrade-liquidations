@@ -1,0 +1,18 @@
+{
+  "name": "papertrade-liquidations",
+  "version": "0.2.0",
+  "description": "Papertrade liquidation maps, closest-to-bust positions and wallet bust distance for agents, via a keyless read-only MCP server.",
+  "author": {
+    "name": "nirholas"
+  },
+  "repository": "https://github.com/nirholas/papertrade-liquidations",
+  "license": "Apache-2.0",
+  "keywords": [
+    "mcp",
+    "papertrade",
+    "liquidations",
+    "hyperevm",
+    "perps"
+  ],
+  "homepage": "https://papertrade-liquidations.pages.dev"
+}

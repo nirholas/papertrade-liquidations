@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "papertrade-liquidations": {
+      "type": "http",
+      "url": "https://papertrade-liquidations.pages.dev/mcp"
+    }
+  }
+}
