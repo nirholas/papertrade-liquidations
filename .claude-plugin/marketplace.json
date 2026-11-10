@@ -7,8 +7,9 @@
   "plugins": [
     {
       "name": "papertrade-liquidations",
-      "source": "./",
+      "source": "./plugins/papertrade-liquidations",
       "description": "Papertrade liquidation maps, closest-to-bust positions and wallet bust distance for agents, via a keyless read-only MCP server.",
+      "category": "development",
       "tags": [
         "mcp",
         "liquidations",
